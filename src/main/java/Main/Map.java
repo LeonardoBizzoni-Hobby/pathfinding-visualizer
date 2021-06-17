@@ -15,6 +15,7 @@
 package Main;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -23,8 +24,6 @@ import java.awt.Graphics;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.List;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -33,16 +32,14 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
     private int size = 30;
     private char key = (char) 0;
 
-    private Node startNode, endNode;
-    private List<Node> barriers = new ArrayList<>();
-
     public Map() {
+        this.setBackground(new Color(40, 40, 40));
         addMouseListener(this);
         addKeyListener(this);
         setFocusable(true);
         addMouseMotionListener(this);
 
-        // Settings up the window
+        // Setting up the window
         window = new JFrame();
         window.setContentPane(this);
         window.setTitle("Pathfinding Algorithm Visualizer");
@@ -58,7 +55,7 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
         super.paintComponent(g);
 
         // Draws the grid
-        g.setColor(Color.lightGray);
+        g.setColor(new Color(50, 48, 47));
         for (int i = 0; i < this.getWidth(); i += size) {
             for (int j = 0; j < this.getHeight(); j += size) {
                 g.drawRect(i, j, size, size);
@@ -66,65 +63,116 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
         }
 
         // Draws start node
-        if (startNode != null) {
+        if (PathfinderUtils.startNode != null) {
             g.setColor(new Color(117, 110, 202));
-            g.fillRect(startNode.getX() + 1, startNode.getY() + 1, size - 1, size - 1);
+            g.fillRect(PathfinderUtils.startNode.getX() + 1, PathfinderUtils.startNode.getY() + 1, size - 1, size - 1);
         }
 
         // Draws end node
-        if (endNode != null) {
+        if (PathfinderUtils.endNode != null) {
             g.setColor(new Color(204, 36, 29));
-            g.fillRect(endNode.getX() + 1, endNode.getY() + 1, size - 1, size - 1);
+            g.fillRect(PathfinderUtils.endNode.getX() + 1, PathfinderUtils.endNode.getY() + 1, size - 1, size - 1);
         }
 
         // Draws barrier nodes
-        g.setColor(new Color(40, 40, 40));
-        for (Node node : barriers) {
+        g.setColor(new Color(235, 219, 178));
+        for (Node node : PathfinderUtils.barriers) {
             g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
         }
     }
 
     // Drawing on the grid
     public void mapDrawing(MouseEvent e) {
+        // Creating nodes
         if (SwingUtilities.isLeftMouseButton(e)) {
             if (key == 's') {
-                int posX = e.getX() % size;
-                int posY = e.getY() % size;
+                int posX = e.getX() - (e.getX() % size);
+                int posY = e.getY() - (e.getY() % size);
 
-                if (startNode == null) {
-                    startNode = new Node(e.getX() - posX, e.getY() - posY);
+                // TODO fa cagare
+                // Checks if start node and end node are the same
+                if (PathfinderUtils.endNode != null) {
+                    if (PathfinderUtils.endNode.getX() == posX && PathfinderUtils.endNode.getY() == posY) {
+                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node", "Same node error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+
+                if (PathfinderUtils.startNode == null) {
+                    PathfinderUtils.startNode = new Node(posX, posY);
                 } else {
-                    startNode.setX(e.getX() - posX);
-                    startNode.setY(e.getY() - posY);
+                    PathfinderUtils.startNode.setX(posX);
+                    PathfinderUtils.startNode.setY(posY);
                 }
 
                 repaint();
             }
 
             else if (key == 'e') {
-                int posX = e.getX() % size;
-                int posY = e.getY() % size;
+                int posX = e.getX() - (e.getX() % size);
+                int posY = e.getY() - (e.getY() % size);
 
-                if (endNode == null) {
-                    endNode = new Node(e.getX() - posX, e.getY() - posY);
+                // TODO fa cagare
+                // Checks if end node and start node are the same
+                if (PathfinderUtils.startNode != null) {
+                    if (PathfinderUtils.startNode.getX() == posX && PathfinderUtils.startNode.getY() == posY) {
+                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node!", "SAME NODE ERROR", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+
+                if (PathfinderUtils.endNode == null) {
+                    PathfinderUtils.endNode = new Node(posX, posY);
                 } else {
-                    endNode.setX(e.getX() - posX);
-                    endNode.setY(e.getY() - posY);
+                    PathfinderUtils.endNode.setX(posX);
+                    PathfinderUtils.endNode.setY(posY);
                 }
 
                 repaint();
             }
 
             else {
-                int posX = e.getX() % size;
-                int posY = e.getY() % size;
+                int posX = e.getX() - (e.getX() % size);
+                int posY = e.getY() - (e.getY() % size);
+                Node barrierNode = new Node(posX, posY);
 
-                barriers.add(new Node(e.getX() - posX, e.getY() - posY));
+                // TODO controlla se si sta creando una barriera su start o end
+
+
+                PathfinderUtils.barriers.add(barrierNode);
 
                 repaint();
             }
         }
-        // TODO cancellare le barriere col tasto destro del mouse
+
+        // Deleting nodes
+        else if (SwingUtilities.isRightMouseButton(e)) {
+            int posX = e.getX() - (e.getX() % size);
+            int posY = e.getY() - (e.getY() % size);
+
+            if (key == 's' && PathfinderUtils.startNode != null) {
+                if (PathfinderUtils.startNode.getX() == posX && PathfinderUtils.startNode.getY() == posY) {
+                    PathfinderUtils.startNode = null;
+                    repaint();
+                }
+            }
+
+            else if (key == 'e' && PathfinderUtils.endNode != null) {
+                if (PathfinderUtils.endNode.getX() == posX && PathfinderUtils.endNode.getY() == posY) {
+                    PathfinderUtils.endNode = null;
+                    repaint();
+                }
+            }
+
+            else {
+                int nodeID = PathfinderUtils.locate(posX, posY);
+
+                if (nodeID != -1) {
+                    PathfinderUtils.remove(nodeID);
+                }
+                repaint();
+            }
+        }
     }
 
     @Override

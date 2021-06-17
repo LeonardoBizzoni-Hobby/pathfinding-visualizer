@@ -1,3 +1,4 @@
 Main/Node.class
 Main/Map.class
 Main/App.class
+Main/PathfinderUtils.class
