@@ -4,12 +4,7 @@
  * - tipo di algoritmo:
  *    + a*
  *    + dijkstra
- *    + greedy best-first search
- *    + swarm
- *    + convergent swarm
- *    + bidirectional swarm
  *    + breadth-first search
- *    + depth-first search
  * zoommare sulla griglia
  */
 package Main;
@@ -31,9 +26,11 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
     private JFrame window;
     private int size = 30;
     private char key = (char) 0;
+    private ControlPanel menu = new ControlPanel(this);
 
     public Map() {
         this.setBackground(new Color(40, 40, 40));
+
         addMouseListener(this);
         addKeyListener(this);
         setFocusable(true);
@@ -79,6 +76,8 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
         for (Node node : PathfinderUtils.barriers) {
             g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
         }
+
+        menu.renderMenu();
     }
 
     // Drawing on the grid
@@ -178,7 +177,6 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
     @Override
     public void keyPressed(KeyEvent e) {
         key = e.getKeyChar();
-        // TODO far partire/fermare l'algoritmo con il tasto invio
     }
 
     @Override
@@ -213,4 +211,5 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
 
     @Override
     public void mouseMoved(MouseEvent e) {}
+
 }
