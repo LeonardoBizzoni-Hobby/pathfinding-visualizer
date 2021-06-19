@@ -5,18 +5,36 @@ import java.util.List;
 
 public class PathfinderUtils {
     static List<Node> barriers = new ArrayList<>();
+    static List<Node> openNodes = new ArrayList<>();
+    static List<Node> closedNodes = new ArrayList<>();
     static Node startNode, endNode;
 
-    static int locate(int x, int y) {
+    // Returns index of barrier if the coordinates are of a barrier node
+    static int locateBarrier(int x, int y) {
         for (int i = 0; i < barriers.size(); i++) {
-            if(barriers.get(i).getX() == x && barriers.get(i).getY() == y)
+            if (barriers.get(i).getX() == x && barriers.get(i).getY() == y)
                 return i;
         }
 
         return -1;
     }
 
+    // Removes barrier node
     static void remove(int id) {
         barriers.remove(id);
+    }
+
+    static void sort() {
+        Node tmp;
+
+        for (int i = 0; i < openNodes.size(); i++) {
+            for (int j = 0; j < openNodes.size(); j++) {
+                if (openNodes.get(i).getF() < openNodes.get(j).getF()) {
+                    tmp = openNodes.get(j);
+                    openNodes.set(j, openNodes.get(i));
+                    openNodes.set(i, tmp);
+                }
+            }
+        }
     }
 }

@@ -1,5 +1,5 @@
-Main/ControlPanel$1.class
 Main/Node.class
+Main/AStar.class
 Main/ControlPanel.class
 Main/Map.class
 Main/App.class

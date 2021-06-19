@@ -2,22 +2,15 @@ package Main;
 
 import java.awt.Color;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 
 public class ControlPanel {
-    private Map map;
-
-    private JButton toggleRunBtn;
-    private JComboBox<String> algo;
+    static JButton toggleRunBtn;
+    static JComboBox<String> algo;
 
     public ControlPanel(Map map) {
-        this.map = map;
-
         algo = new JComboBox<>(new String[] { "Select an algorithm", "A*", "Dijkstra", "Breadth-first search"});
         algo.setVisible(true);
 
@@ -25,48 +18,7 @@ public class ControlPanel {
         toggleRunBtn.setVisible(true);
         toggleRunBtn.setMargin(new Insets(0, 0, 0, 0));
         toggleRunBtn.setBackground(Color.white);
-        toggleRunBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                if (toggleRunBtn.getText().equals("Run")) {
-                    switch (algo.getItemAt(algo.getSelectedIndex())) {
-
-                    case ("A*"):
-                        System.out.println("A* selected");
-                        // AStar.start();
-                        break;
-
-                    case ("Dijkstra"):
-                        System.out.println("Dijkstra selected");
-                        // AStar.start();
-                        break;
-
-                    case ("Greedy best-first search"):
-                        System.out.println("Greedy best-first search selected");
-                        // AStar.start();
-                        break;
-
-                    case ("Breadth-first search"):
-                        System.out.println("Breadth-first search selected");
-                        // AStar.start();
-                        break;
-
-                    default:
-                        JOptionPane.showMessageDialog(null,
-                                "You must select an algorithm before starting the pathfinder", "Algorithm not selected",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    toggleRunBtn.setText("Stop");
-                }
-
-                else {
-                    toggleRunBtn.setText("Run");
-                }
-            }
-        });
+        toggleRunBtn.addActionListener(map);
 
         map.add(algo);
         map.add(toggleRunBtn);

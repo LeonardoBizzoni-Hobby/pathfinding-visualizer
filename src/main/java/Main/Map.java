@@ -9,24 +9,32 @@
  */
 package Main;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
-class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
+class Map extends JPanel implements ActionListener, MouseListener, MouseMotionListener, KeyListener {
     private JFrame window;
-    private int size = 30;
     private char key = (char) 0;
     private ControlPanel menu = new ControlPanel(this);
+
+    static int width;
+    static int height;
+    boolean isFinished = false;
+
+    int size = 30;
 
     public Map() {
         this.setBackground(new Color(40, 40, 40));
@@ -40,9 +48,13 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
         window = new JFrame();
         window.setContentPane(this);
         window.setTitle("Pathfinding Algorithm Visualizer");
+        window.getContentPane().setPreferredSize(new Dimension(1920, 1080));
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.pack();
         window.setVisible(true);
+
+        width = this.getWidth();
+        height = this.getHeight();
 
         this.revalidate();
         this.repaint();
@@ -78,6 +90,18 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
         }
 
         menu.renderMenu();
+
+        // Draws open nodes
+        g.setColor(Color.white);
+        for (Node node : PathfinderUtils.openNodes) {
+            g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
+        }
+
+        // Draws closed nodes
+        g.setColor(Color.orange);
+        for (Node node : PathfinderUtils.closedNodes) {
+            g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
+        }
     }
 
     // Drawing on the grid
@@ -92,7 +116,8 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
                 // Checks if start node and end node are the same
                 if (PathfinderUtils.endNode != null) {
                     if (PathfinderUtils.endNode.getX() == posX && PathfinderUtils.endNode.getY() == posY) {
-                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node", "Same node error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
+                                "Same node error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                 }
@@ -115,7 +140,8 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
                 // Checks if end node and start node are the same
                 if (PathfinderUtils.startNode != null) {
                     if (PathfinderUtils.startNode.getX() == posX && PathfinderUtils.startNode.getY() == posY) {
-                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node!", "SAME NODE ERROR", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node!",
+                                "SAME NODE ERROR", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                 }
@@ -136,7 +162,6 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
                 Node barrierNode = new Node(posX, posY);
 
                 // TODO controlla se si sta creando una barriera su start o end
-
 
                 PathfinderUtils.barriers.add(barrierNode);
 
@@ -164,7 +189,7 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
             }
 
             else {
-                int nodeID = PathfinderUtils.locate(posX, posY);
+                int nodeID = PathfinderUtils.locateBarrier(posX, posY);
 
                 if (nodeID != -1) {
                     PathfinderUtils.remove(nodeID);
@@ -195,21 +220,65 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void actionPerformed(ActionEvent e) {
+        if (ControlPanel.toggleRunBtn.getText().equals("Run")) {
+            switch (ControlPanel.algo.getItemAt(ControlPanel.algo.getSelectedIndex())) {
+
+            case ("A*"):
+                System.out.println("A* selected");
+                new AStar(this).start();
+                break;
+
+            case ("Dijkstra"):
+                System.out.println("Dijkstra selected");
+                // AStar.start();
+                break;
+
+            case ("Greedy best-first search"):
+                System.out.println("Greedy best-first search selected");
+                // AStar.start();
+                break;
+
+            case ("Breadth-first search"):
+                System.out.println("Breadth-first search selected");
+                // AStar.start();
+                break;
+
+            default:
+                JOptionPane.showMessageDialog(null, "You must select an algorithm before starting the pathfinder",
+                        "Algorithm not selected", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            ControlPanel.toggleRunBtn.setText("Stop");
+        }
+
+        else {
+            ControlPanel.toggleRunBtn.setText("Run");
+        }
+    }
 
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void keyTyped(KeyEvent e) {
+    }
 
     @Override
-    public void mouseReleased(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+    }
 
     @Override
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseReleased(MouseEvent e) {
+    }
 
     @Override
-    public void mouseExited(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+    }
 
     @Override
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseExited(MouseEvent e) {
+    }
 
+    @Override
+    public void mouseMoved(MouseEvent e) {
+    }
 }
