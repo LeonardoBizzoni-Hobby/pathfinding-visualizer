@@ -24,18 +24,8 @@ public class AStar{
         PathfinderUtils.closedNodes.add(parent);
         PathfinderUtils.openNodes.remove(parent);
 
-        if (parent.getX() == PathfinderUtils.endNode.getX() && parent.getY() == PathfinderUtils.endNode.getY()) {
-            ControlPanel.toggleRunBtn.setText("End");
-            map.isFinished = true;
-            map.repaint();
-            return;
-        }
-
-        if (!map.isFinished) {
+        if (!map.isFinished) 
             searchPath(parent);
-        }
-        else
-            System.exit(0);
     }
 
     public void calculateOpenNode(int nextX, int nextY, Node parent) {
@@ -45,6 +35,12 @@ public class AStar{
             return;
         if (nextX == PathfinderUtils.startNode.getX() && nextY == PathfinderUtils.startNode.getY())
             return;
+        if (nextX == PathfinderUtils.endNode.getX() && nextY == PathfinderUtils.endNode.getY()) {
+            map.isFinished = true;
+            ControlPanel.toggleRunBtn.setText("Clear");
+            map.repaint();
+            return;
+        }
 
         Node openNode = new Node(nextX, nextY);
         openNode.setParentNode(parent);

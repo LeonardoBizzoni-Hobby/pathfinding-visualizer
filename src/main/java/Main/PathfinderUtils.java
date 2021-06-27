@@ -24,6 +24,12 @@ public class PathfinderUtils {
         barriers.remove(id);
     }
 
+    static boolean checkDuplicateNode(Node a, Node b) {
+        if(a.getX() == b.getX() && a.getY() == b.getY())
+            return true;
+        return false;
+    }
+
     static void sort() {
         Node tmp;
 

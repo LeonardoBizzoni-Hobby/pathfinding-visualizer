@@ -16,8 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent; import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JFrame;
@@ -98,7 +97,7 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
         }
 
         // Draws closed nodes
-        g.setColor(Color.orange);
+        g.setColor(new Color(132, 255, 138));
         for (Node node : PathfinderUtils.closedNodes) {
             g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
         }
@@ -112,10 +111,9 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
                 int posX = e.getX() - (e.getX() % size);
                 int posY = e.getY() - (e.getY() % size);
 
-                // TODO fa cagare
                 // Checks if start node and end node are the same
-                if (PathfinderUtils.endNode != null) {
-                    if (PathfinderUtils.endNode.getX() == posX && PathfinderUtils.endNode.getY() == posY) {
+                if (PathfinderUtils.startNode != null && PathfinderUtils.endNode != null) {
+                    if (PathfinderUtils.checkDuplicateNode(PathfinderUtils.startNode, PathfinderUtils.endNode)) {
                         JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
                                 "Same node error", JOptionPane.ERROR_MESSAGE);
                         return;
@@ -136,10 +134,9 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
                 int posX = e.getX() - (e.getX() % size);
                 int posY = e.getY() - (e.getY() % size);
 
-                // TODO fa cagare
                 // Checks if end node and start node are the same
-                if (PathfinderUtils.startNode != null) {
-                    if (PathfinderUtils.startNode.getX() == posX && PathfinderUtils.startNode.getY() == posY) {
+                if (PathfinderUtils.startNode != null && PathfinderUtils.endNode != null) {
+                    if (PathfinderUtils.checkDuplicateNode(PathfinderUtils.startNode, PathfinderUtils.endNode)) {
                         JOptionPane.showMessageDialog(null, "End node and start node can't be the same node!",
                                 "SAME NODE ERROR", JOptionPane.ERROR_MESSAGE);
                         return;
@@ -161,7 +158,12 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
                 int posY = e.getY() - (e.getY() % size);
                 Node barrierNode = new Node(posX, posY);
 
-                // TODO controlla se si sta creando una barriera su start o end
+                if(PathfinderUtils.startNode != null)
+                    if(PathfinderUtils.checkDuplicateNode(barrierNode, PathfinderUtils.startNode))
+                        return;
+                if(PathfinderUtils.endNode != null)
+                    if(PathfinderUtils.checkDuplicateNode(barrierNode, PathfinderUtils.endNode))
+                        return;
 
                 PathfinderUtils.barriers.add(barrierNode);
 
@@ -225,17 +227,11 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
             switch (ControlPanel.algo.getItemAt(ControlPanel.algo.getSelectedIndex())) {
 
             case ("A*"):
-                System.out.println("A* selected");
                 new AStar(this).start();
                 break;
 
             case ("Dijkstra"):
                 System.out.println("Dijkstra selected");
-                // AStar.start();
-                break;
-
-            case ("Greedy best-first search"):
-                System.out.println("Greedy best-first search selected");
                 // AStar.start();
                 break;
 
@@ -249,11 +245,18 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
                         "Algorithm not selected", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            ControlPanel.toggleRunBtn.setText("Stop");
         }
 
-        else {
+        else if(ControlPanel.toggleRunBtn.getText().equals("Clear")){
+            PathfinderUtils.barriers.removeAll(PathfinderUtils.barriers);
+            PathfinderUtils.openNodes.removeAll(PathfinderUtils.openNodes);
+            PathfinderUtils.closedNodes.removeAll(PathfinderUtils.closedNodes);
+            PathfinderUtils.startNode = null;
+            PathfinderUtils.endNode = null;
+
+            isFinished = false;
+
+            this.repaint();
             ControlPanel.toggleRunBtn.setText("Run");
         }
     }

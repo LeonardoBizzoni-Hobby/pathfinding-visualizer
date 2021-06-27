@@ -13,12 +13,14 @@ public class ControlPanel {
     public ControlPanel(Map map) {
         algo = new JComboBox<>(new String[] { "Select an algorithm", "A*", "Dijkstra", "Breadth-first search"});
         algo.setVisible(true);
+        algo.setFocusable(false);
 
         toggleRunBtn = new JButton("Run");
         toggleRunBtn.setVisible(true);
         toggleRunBtn.setMargin(new Insets(0, 0, 0, 0));
         toggleRunBtn.setBackground(Color.white);
         toggleRunBtn.addActionListener(map);
+        toggleRunBtn.setFocusable(false);
 
         map.add(algo);
         map.add(toggleRunBtn);
