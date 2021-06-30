@@ -5,6 +5,7 @@ public class AStar{
 
     public AStar(Map map) {
         this.map = map;
+        PathfinderUtils.path.removeAll(PathfinderUtils.path);
     }
 
     public void start() {
@@ -36,6 +37,9 @@ public class AStar{
         if (nextX == PathfinderUtils.startNode.getX() && nextY == PathfinderUtils.startNode.getY())
             return;
         if (nextX == PathfinderUtils.endNode.getX() && nextY == PathfinderUtils.endNode.getY()) {
+            PathfinderUtils.endNode.setParentNode(parent);
+
+            PathfinderUtils.drawPath();
             map.isFinished = true;
             ControlPanel.toggleRunBtn.setText("Clear");
             map.repaint();

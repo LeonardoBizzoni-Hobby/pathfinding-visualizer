@@ -91,15 +91,23 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
         menu.renderMenu();
 
         // Draws open nodes
-        g.setColor(Color.white);
+        g.setColor(new Color(69, 133, 136));
         for (Node node : PathfinderUtils.openNodes) {
             g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
         }
 
         // Draws closed nodes
-        g.setColor(new Color(132, 255, 138));
+        g.setColor(new Color(77, 77, 77));
         for (Node node : PathfinderUtils.closedNodes) {
             g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
+        }
+
+        // if path is found start drawing the shortest path
+        if (isFinished) {
+            g.setColor(new Color(250, 189, 47));
+            for (Node node : PathfinderUtils.path) {
+                g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
+            }
         }
     }
 
@@ -113,7 +121,7 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
 
                 // Checks if start node and end node are the same
                 if (PathfinderUtils.startNode != null && PathfinderUtils.endNode != null) {
-                    if (PathfinderUtils.checkDuplicateNode(PathfinderUtils.startNode, PathfinderUtils.endNode)) {
+                    if (PathfinderUtils.isSameNode(PathfinderUtils.startNode, PathfinderUtils.endNode)) {
                         JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
                                 "Same node error", JOptionPane.ERROR_MESSAGE);
                         return;
@@ -136,7 +144,7 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
 
                 // Checks if end node and start node are the same
                 if (PathfinderUtils.startNode != null && PathfinderUtils.endNode != null) {
-                    if (PathfinderUtils.checkDuplicateNode(PathfinderUtils.startNode, PathfinderUtils.endNode)) {
+                    if (PathfinderUtils.isSameNode(PathfinderUtils.startNode, PathfinderUtils.endNode)) {
                         JOptionPane.showMessageDialog(null, "End node and start node can't be the same node!",
                                 "SAME NODE ERROR", JOptionPane.ERROR_MESSAGE);
                         return;
@@ -159,10 +167,10 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
                 Node barrierNode = new Node(posX, posY);
 
                 if(PathfinderUtils.startNode != null)
-                    if(PathfinderUtils.checkDuplicateNode(barrierNode, PathfinderUtils.startNode))
+                    if(PathfinderUtils.isSameNode(barrierNode, PathfinderUtils.startNode))
                         return;
                 if(PathfinderUtils.endNode != null)
-                    if(PathfinderUtils.checkDuplicateNode(barrierNode, PathfinderUtils.endNode))
+                    if(PathfinderUtils.isSameNode(barrierNode, PathfinderUtils.endNode))
                         return;
 
                 PathfinderUtils.barriers.add(barrierNode);
