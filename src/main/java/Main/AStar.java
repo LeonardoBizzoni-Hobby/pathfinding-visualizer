@@ -2,10 +2,11 @@ package Main;
 
 public class AStar{
     private Map map;
+    private int x, y;
 
     public AStar(Map map) {
         this.map = map;
-        PathfinderUtils.path.removeAll(PathfinderUtils.path);
+        PathfinderUtils.path.clear();
     }
 
     public void start() {
@@ -14,18 +15,19 @@ public class AStar{
     
     public void searchPath(Node parent) {
         for (int i = 0; i < 4; i++) {
-            int x = (int) Math.round(parent.getX() + (-map.size* Math.cos((Math.PI / 2) * i)));
-            int y = (int) Math.round(parent.getY() + (-map.size* Math.sin((Math.PI / 2) * i)));
+            x = (int) Math.round(parent.getX() + (-map.size* Math.cos((Math.PI / 2) * i)));
+            y = (int) Math.round(parent.getY() + (-map.size* Math.sin((Math.PI / 2) * i)));
 
             calculateOpenNode(x, y, parent);
         }
 
-        parent = getNextBestNode();
+        if((parent = getNextBestNode()) == null)
+            return;
 
         PathfinderUtils.closedNodes.add(parent);
         PathfinderUtils.openNodes.remove(parent);
 
-        if (!map.isFinished) 
+        if (!map.isFinished)
             searchPath(parent);
     }
 
@@ -86,7 +88,14 @@ public class AStar{
     }
 
     public Node getNextBestNode() {
-        PathfinderUtils.sort();
-        return PathfinderUtils.openNodes.get(0);
+        if (PathfinderUtils.openNodes.size() > 0) {
+            PathfinderUtils.sort();
+            return PathfinderUtils.openNodes.get(0);
+        }
+
+        map.isFinished = true;
+        ControlPanel.toggleRunBtn.setText("Clear");
+        map.repaint();
+        return null;
     }
 }

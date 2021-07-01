@@ -16,7 +16,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent; import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import javax.swing.JFrame;
@@ -33,7 +34,7 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
     static int height;
     boolean isFinished = false;
 
-    int size = 30;
+    int size = 20;
 
     public Map() {
         this.setBackground(new Color(40, 40, 40));
@@ -83,7 +84,7 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
         }
 
         // Draws barrier nodes
-        g.setColor(new Color(235, 219, 178));
+        g.setColor(Color.white);
         for (Node node : PathfinderUtils.barriers) {
             g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
         }
@@ -166,11 +167,11 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
                 int posY = e.getY() - (e.getY() % size);
                 Node barrierNode = new Node(posX, posY);
 
-                if(PathfinderUtils.startNode != null)
-                    if(PathfinderUtils.isSameNode(barrierNode, PathfinderUtils.startNode))
+                if (PathfinderUtils.startNode != null)
+                    if (PathfinderUtils.isSameNode(barrierNode, PathfinderUtils.startNode))
                         return;
-                if(PathfinderUtils.endNode != null)
-                    if(PathfinderUtils.isSameNode(barrierNode, PathfinderUtils.endNode))
+                if (PathfinderUtils.endNode != null)
+                    if (PathfinderUtils.isSameNode(barrierNode, PathfinderUtils.endNode))
                         return;
 
                 PathfinderUtils.barriers.add(barrierNode);
@@ -232,8 +233,11 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
     @Override
     public void actionPerformed(ActionEvent e) {
         if (ControlPanel.toggleRunBtn.getText().equals("Run")) {
-            switch (ControlPanel.algo.getItemAt(ControlPanel.algo.getSelectedIndex())) {
 
+            if (PathfinderUtils.startNode == null || PathfinderUtils.endNode == null)
+                return;
+
+            switch (ControlPanel.algo.getItemAt(ControlPanel.algo.getSelectedIndex())) {
             case ("A*"):
                 new AStar(this).start();
                 break;
@@ -255,10 +259,10 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
             }
         }
 
-        else if(ControlPanel.toggleRunBtn.getText().equals("Clear")){
-            PathfinderUtils.barriers.removeAll(PathfinderUtils.barriers);
-            PathfinderUtils.openNodes.removeAll(PathfinderUtils.openNodes);
-            PathfinderUtils.closedNodes.removeAll(PathfinderUtils.closedNodes);
+        else if (ControlPanel.toggleRunBtn.getText().equals("Clear")) {
+            PathfinderUtils.barriers.clear();
+            PathfinderUtils.openNodes.clear();
+            PathfinderUtils.closedNodes.clear();
             PathfinderUtils.startNode = null;
             PathfinderUtils.endNode = null;
 
