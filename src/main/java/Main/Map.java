@@ -1,12 +1,3 @@
-/* TODO
- * aggiungere una sorta di menu dove scegliere:
- * - velocità di riproduzione
- * - tipo di algoritmo:
- *    + a*
- *    + dijkstra
- *    + breadth-first search
- * zoommare sulla griglia
- */
 package Main;
 
 import java.awt.Color;
@@ -14,8 +5,6 @@ import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -25,14 +14,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-class Map extends JPanel implements ActionListener, MouseListener, MouseMotionListener, KeyListener {
+class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
     private JFrame window;
     private char key = (char) 0;
-    private ControlPanel menu = new ControlPanel(this);
 
     static int width;
     static int height;
     boolean isFinished = false;
+    boolean running = false;
 
     int size = 20;
 
@@ -89,8 +78,6 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
             g.fillRect(node.getX() + 1, node.getY() + 1, size - 1, size - 1);
         }
 
-        menu.renderMenu();
-
         // Draws open nodes
         g.setColor(new Color(69, 133, 136));
         for (Node node : PathfinderUtils.openNodes) {
@@ -120,18 +107,22 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
                 int posX = e.getX() - (e.getX() % size);
                 int posY = e.getY() - (e.getY() % size);
 
-                // Checks if start node and end node are the same
-                if (PathfinderUtils.startNode != null && PathfinderUtils.endNode != null) {
-                    if (PathfinderUtils.isSameNode(PathfinderUtils.startNode, PathfinderUtils.endNode)) {
-                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
-                                "Same node error", JOptionPane.ERROR_MESSAGE);
+                if (PathfinderUtils.startNode == null && PathfinderUtils.endNode == null) {
+                    PathfinderUtils.startNode = new Node(posX, posY);
+                } else if (PathfinderUtils.endNode != null && PathfinderUtils.startNode == null) {
+                    if (posX == PathfinderUtils.endNode.getX() && posY == PathfinderUtils.endNode.getY()) {
+                        JOptionPane.showMessageDialog(null, "Same node error",
+                                "End node and start node can't be the same node", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                }
-
-                if (PathfinderUtils.startNode == null) {
                     PathfinderUtils.startNode = new Node(posX, posY);
                 } else {
+                    if (posX == PathfinderUtils.endNode.getX() && posY == PathfinderUtils.endNode.getY()) {
+                        JOptionPane.showMessageDialog(null, "Same node error",
+                                "End node and start node can't be the same node", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
                     PathfinderUtils.startNode.setX(posX);
                     PathfinderUtils.startNode.setY(posY);
                 }
@@ -143,18 +134,22 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
                 int posX = e.getX() - (e.getX() % size);
                 int posY = e.getY() - (e.getY() % size);
 
-                // Checks if end node and start node are the same
-                if (PathfinderUtils.startNode != null && PathfinderUtils.endNode != null) {
-                    if (PathfinderUtils.isSameNode(PathfinderUtils.startNode, PathfinderUtils.endNode)) {
-                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node!",
-                                "SAME NODE ERROR", JOptionPane.ERROR_MESSAGE);
+                if (PathfinderUtils.startNode == null && PathfinderUtils.endNode == null) {
+                    PathfinderUtils.endNode = new Node(posX, posY);
+                } else if (PathfinderUtils.startNode != null && PathfinderUtils.endNode == null) {
+                    if (posX == PathfinderUtils.startNode.getX() && posY == PathfinderUtils.startNode.getY()) {
+                        JOptionPane.showMessageDialog(null, "Same node error",
+                                "End node and start node can't be the same node", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                }
-
-                if (PathfinderUtils.endNode == null) {
                     PathfinderUtils.endNode = new Node(posX, posY);
                 } else {
+                    if (posX == PathfinderUtils.startNode.getX() && posY == PathfinderUtils.startNode.getY()) {
+                        JOptionPane.showMessageDialog(null, "Same node error",
+                                "End node and start node can't be the same node", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
                     PathfinderUtils.endNode.setX(posX);
                     PathfinderUtils.endNode.setY(posY);
                 }
@@ -213,6 +208,30 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
     @Override
     public void keyPressed(KeyEvent e) {
         key = e.getKeyChar();
+
+        if (key == KeyEvent.VK_SPACE) {
+            if (running == false && isFinished == false) {
+                if (PathfinderUtils.startNode == null || PathfinderUtils.endNode == null) {
+                    JOptionPane.showMessageDialog(null, "Missing node", "Missing start or end node",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                running = true;
+                new AStar(this).start();
+            } else if (running == false && isFinished == true) {
+                PathfinderUtils.barriers.clear();
+                PathfinderUtils.openNodes.clear();
+                PathfinderUtils.closedNodes.clear();
+                PathfinderUtils.startNode = null;
+                PathfinderUtils.endNode = null;
+
+                isFinished = false;
+                running = false;
+
+                this.repaint();
+            }
+        }
     }
 
     @Override
@@ -228,49 +247,6 @@ class Map extends JPanel implements ActionListener, MouseListener, MouseMotionLi
     @Override
     public void mouseDragged(MouseEvent e) {
         mapDrawing(e);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (ControlPanel.toggleRunBtn.getText().equals("Run")) {
-
-            if (PathfinderUtils.startNode == null || PathfinderUtils.endNode == null)
-                return;
-
-            switch (ControlPanel.algo.getItemAt(ControlPanel.algo.getSelectedIndex())) {
-            case ("A*"):
-                new AStar(this).start();
-                break;
-
-            case ("Dijkstra"):
-                System.out.println("Dijkstra selected");
-                // AStar.start();
-                break;
-
-            case ("Breadth-first search"):
-                System.out.println("Breadth-first search selected");
-                // AStar.start();
-                break;
-
-            default:
-                JOptionPane.showMessageDialog(null, "You must select an algorithm before starting the pathfinder",
-                        "Algorithm not selected", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
-
-        else if (ControlPanel.toggleRunBtn.getText().equals("Clear")) {
-            PathfinderUtils.barriers.clear();
-            PathfinderUtils.openNodes.clear();
-            PathfinderUtils.closedNodes.clear();
-            PathfinderUtils.startNode = null;
-            PathfinderUtils.endNode = null;
-
-            isFinished = false;
-
-            this.repaint();
-            ControlPanel.toggleRunBtn.setText("Run");
-        }
     }
 
     @Override

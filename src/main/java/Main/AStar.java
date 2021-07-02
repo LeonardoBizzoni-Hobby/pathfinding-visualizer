@@ -43,7 +43,7 @@ public class AStar{
 
             PathfinderUtils.drawPath();
             map.isFinished = true;
-            ControlPanel.toggleRunBtn.setText("Clear");
+            map.running = false;
             map.repaint();
             return;
         }
@@ -94,7 +94,6 @@ public class AStar{
         }
 
         map.isFinished = true;
-        ControlPanel.toggleRunBtn.setText("Clear");
         map.repaint();
         return null;
     }
