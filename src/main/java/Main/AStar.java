@@ -15,8 +15,8 @@ public class AStar{
     
     public void searchPath(Node parent) {
         for (int i = 0; i < 4; i++) {
-            x = (int) Math.round(parent.getX() + (-map.size* Math.cos((Math.PI / 2) * i)));
-            y = (int) Math.round(parent.getY() + (-map.size* Math.sin((Math.PI / 2) * i)));
+            x = (int) Math.round(parent.getX() + (-map.getNodeSize()* Math.cos((Math.PI / 2) * i)));
+            y = (int) Math.round(parent.getY() + (-map.getNodeSize() * Math.sin((Math.PI / 2) * i)));
 
             calculateOpenNode(x, y, parent);
         }
@@ -27,12 +27,12 @@ public class AStar{
         PathfinderUtils.closedNodes.add(parent);
         PathfinderUtils.openNodes.remove(parent);
 
-        if (!map.isFinished)
+        if (!map.isFinished())
             searchPath(parent);
     }
 
     public void calculateOpenNode(int nextX, int nextY, Node parent) {
-        if (nextX >= Map.width || nextY >= Map.height || nextX < 0 || nextY < 0)
+        if (nextX >= map.getWidth() || nextY >= map.getHeight() || nextX < 0 || nextY < 0)
             return;
         if (PathfinderUtils.locateBarrier(nextX, nextY) != -1)
             return;
@@ -42,8 +42,8 @@ public class AStar{
             PathfinderUtils.endNode.setParentNode(parent);
 
             PathfinderUtils.drawPath();
-            map.isFinished = true;
-            map.running = false;
+            map.setFinished(true);
+            map.setRunning(false);
             map.repaint();
             return;
         }
@@ -68,9 +68,9 @@ public class AStar{
         int g = parent.getG();
 
         if (gx != 0 && gy != 0) {
-            g += (int) (Math.sqrt(2 * (Math.pow(map.size, 2))));
+            g += (int) (Math.sqrt(2 * (Math.pow(map.getNodeSize(), 2))));
         } else {
-            g += map.size;
+            g += map.getNodeSize();
         }
         openNode.setG(g);
 
@@ -93,7 +93,7 @@ public class AStar{
             return PathfinderUtils.openNodes.get(0);
         }
 
-        map.isFinished = true;
+        map.setFinished(true);
         map.repaint();
         return null;
     }

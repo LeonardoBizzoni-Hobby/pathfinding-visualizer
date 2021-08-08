@@ -18,12 +18,9 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
     private JFrame window;
     private char key = (char) 0;
 
-    static int width;
-    static int height;
-    boolean isFinished = false;
-    boolean running = false;
-
-    int size = 20;
+    private boolean isFinished = false;
+    private boolean running = false;
+    private int size = 20;
 
     public Map() {
         this.setBackground(new Color(40, 40, 40));
@@ -41,9 +38,6 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.pack();
         window.setVisible(true);
-
-        width = this.getWidth();
-        height = this.getHeight();
 
         this.revalidate();
         this.repaint();
@@ -271,5 +265,29 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
 
     @Override
     public void mouseMoved(MouseEvent e) {
+    }
+
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean isFinished) {
+        this.isFinished = isFinished;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
+    public int getNodeSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 }

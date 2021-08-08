@@ -1,5 +1,5 @@
 Main/Node.class
 Main/AStar.class
 Main/Map.class
-Main/App.class
 Main/PathfinderUtils.class
+Main/App.class
