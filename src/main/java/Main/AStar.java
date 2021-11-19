@@ -1,6 +1,8 @@
 package Main;
 
-public class AStar{
+import javax.swing.JOptionPane;
+
+public class AStar implements Runnable {
     private Map map;
     private int x, y;
 
@@ -9,26 +11,33 @@ public class AStar{
         PathfinderUtils.path.clear();
     }
 
-    public void start() {
+    @Override
+    public void run() {
         searchPath(PathfinderUtils.startNode);
     }
     
     public void searchPath(Node parent) {
-        for (int i = 0; i < 4; i++) {
-            x = (int) Math.round(parent.getX() + (-map.getNodeSize()* Math.cos((Math.PI / 2) * i)));
-            y = (int) Math.round(parent.getY() + (-map.getNodeSize() * Math.sin((Math.PI / 2) * i)));
+        while (!map.isFinished()) {
+            for (int i = 0; i < 4; i++) {
+                x = (int) Math.round(parent.getX() + (-map.getNodeSize() * Math.cos((Math.PI / 2) * i)));
+                y = (int) Math.round(parent.getY() + (-map.getNodeSize() * Math.sin((Math.PI / 2) * i)));
 
-            calculateOpenNode(x, y, parent);
+                calculateOpenNode(x, y, parent);
+            }
+
+            if ((parent = getNextBestNode()) == null)
+                return;
+
+            PathfinderUtils.closedNodes.add(parent);
+            PathfinderUtils.openNodes.remove(parent);
+
+            map.repaint();
+            try {
+                Thread.sleep(map.speed);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-
-        if((parent = getNextBestNode()) == null)
-            return;
-
-        PathfinderUtils.closedNodes.add(parent);
-        PathfinderUtils.openNodes.remove(parent);
-
-        if (!map.isFinished())
-            searchPath(parent);
     }
 
     public void calculateOpenNode(int nextX, int nextY, Node parent) {
@@ -44,7 +53,6 @@ public class AStar{
             PathfinderUtils.drawPath();
             map.setFinished(true);
             map.setRunning(false);
-            map.repaint();
             return;
         }
 
@@ -85,6 +93,7 @@ public class AStar{
         openNode.setF(f);
 
         PathfinderUtils.openNodes.add(openNode);
+        map.repaint();
     }
 
     public Node getNextBestNode() {
@@ -94,7 +103,8 @@ public class AStar{
         }
 
         map.setFinished(true);
-        map.repaint();
+        map.setRunning(false);
+        JOptionPane.showMessageDialog(null, "No path found!", "Pathfinder error", JOptionPane.ERROR_MESSAGE);
         return null;
     }
 }
