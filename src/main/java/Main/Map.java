@@ -22,7 +22,7 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
     private boolean running = false;
 
     private int size = 20;
-    int speed = 10;
+    int speed = 2;
 
     public Map() {
         this.setBackground(new Color(40, 40, 40));
@@ -127,7 +127,7 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
 
                 // If they both exist check if same node else move che start node
                 else {
-                    if (PathfinderUtils.isSameNode(node, PathfinderUtils.endNode)) {
+                    if (PathfinderUtils.endNode != null && PathfinderUtils.isSameNode(node, PathfinderUtils.endNode)) {
                         JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
                                 "Same node error", JOptionPane.ERROR_MESSAGE);
                         return;
@@ -161,7 +161,7 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
                 }
                 // If they both exist check if same node else move the end node
                 else {
-                    if (PathfinderUtils.startNode != null && PathfinderUtils.endNode == null) {
+                    if (PathfinderUtils.startNode !=null && PathfinderUtils.isSameNode(node, PathfinderUtils.startNode)) {
                         JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
                                 "Same node error", JOptionPane.ERROR_MESSAGE);
                         return;
