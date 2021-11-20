@@ -1,0 +1,23 @@
+* A* Pathfinding visualizer
+[[file:https://github.com/LeonardoBizzoni/pathfinding-visualizer/blob/master/imgs/eg.png?raw=true]]
+*blue node*: starting node
+
+*red node*: ending node
+
+*white node*: barrier node
+
+*yellow node*: shortest path
+
+** Keybindings
+- *q*: quit
+- *spacebar*: start / restart pathfinding
+
+
+- *hold s + left click*: set starting node
+- *hold e + left click*: set ending node
+- *left click*: set barrier node
+
+
+- *hold s + right click*: remove starting node
+- *hold e + right click*: remove ending node
+- *right click*: remove barrier node
