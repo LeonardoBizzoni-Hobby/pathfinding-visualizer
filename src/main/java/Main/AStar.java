@@ -25,13 +25,13 @@ public class AStar implements Runnable {
                 calculateOpenNode(x, y, parent);
             }
 
+            map.repaint();
             if ((parent = getNextBestNode()) == null)
                 return;
 
             PathfinderUtils.closedNodes.add(parent);
             PathfinderUtils.openNodes.remove(parent);
 
-            map.repaint();
             try {
                 Thread.sleep(map.speed);
             } catch (InterruptedException e) {

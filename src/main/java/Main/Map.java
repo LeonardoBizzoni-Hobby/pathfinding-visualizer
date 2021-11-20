@@ -1,8 +1,8 @@
 package Main;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -22,10 +22,10 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
     private boolean running = false;
 
     private int size = 20;
-    int speed = 2;
+    int speed = 5;
 
     public Map() {
-        this.setBackground(new Color(40, 40, 40));
+        setBackground(new Color(40, 40, 40));
 
         addMouseListener(this);
         addKeyListener(this);
@@ -41,8 +41,8 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
         window.pack();
         window.setVisible(true);
 
-        this.revalidate();
-        this.repaint();
+        revalidate();
+        repaint();
     }
 
     public void paintComponent(Graphics g) {
@@ -50,8 +50,8 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
 
         // Draws the grid
         g.setColor(new Color(50, 48, 47));
-        for (int i = 0; i < this.getWidth(); i += size) {
-            for (int j = 0; j < this.getHeight(); j += size) {
+        for (int i = 0; i < getWidth(); i += size) {
+            for (int j = 0; j < getHeight(); j += size) {
                 g.drawRect(i, j, size, size);
             }
         }
@@ -115,21 +115,18 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
                 else if (PathfinderUtils.endNode != null && PathfinderUtils.startNode == null) {
                     if (PathfinderUtils.isSameNode(node, PathfinderUtils.endNode)) {
                         // Send an error message saying that start and end node are the same
-                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
-                                "Same node error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node", "Same node error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
                     // Set the node as the start node
                     PathfinderUtils.startNode = node;
-
                 }
 
-                // If they both exist check if same node else move che start node
+                // If the start node exists check if end node exist and move the start
                 else {
                     if (PathfinderUtils.endNode != null && PathfinderUtils.isSameNode(node, PathfinderUtils.endNode)) {
-                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
-                                "Same node error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node", "Same node error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
@@ -150,8 +147,7 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
                 else if (PathfinderUtils.startNode != null && PathfinderUtils.endNode == null) {
                     if (PathfinderUtils.isSameNode(node, PathfinderUtils.startNode)) {
                         // Send an error message saying that start and end node are the same
-                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
-                                "Same node error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node", "Same node error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
@@ -159,11 +155,10 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
                     PathfinderUtils.endNode = node;
 
                 }
-                // If they both exist check if same node else move the end node
+                // If the end node exists check if start node exist and move the start
                 else {
                     if (PathfinderUtils.startNode !=null && PathfinderUtils.isSameNode(node, PathfinderUtils.startNode)) {
-                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node",
-                                "Same node error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "End node and start node can't be the same node", "Same node error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
@@ -184,55 +179,53 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
 
                 PathfinderUtils.barriers.add(node);
             }
-
-            // Update the UI with barrier/start/end node
-            repaint();
         }
 
         // Deleting nodes
         else if (SwingUtilities.isRightMouseButton(e)) {
-            int posX = e.getX() - (e.getX() % size);
-            int posY = e.getY() - (e.getY() % size);
-
             if (key == 's' && PathfinderUtils.startNode != null) {
-                if (PathfinderUtils.startNode.getX() == posX && PathfinderUtils.startNode.getY() == posY) {
+                if (PathfinderUtils.isSameNode(node, PathfinderUtils.startNode)) {
                     PathfinderUtils.startNode = null;
                 }
             }
 
             else if (key == 'e' && PathfinderUtils.endNode != null) {
-                if (PathfinderUtils.endNode.getX() == posX && PathfinderUtils.endNode.getY() == posY) {
+                if (PathfinderUtils.isSameNode(node, PathfinderUtils.endNode)) {
                     PathfinderUtils.endNode = null;
                 }
             }
 
             else {
-                int nodeID = PathfinderUtils.locateBarrier(posX, posY);
+                int nodeID = PathfinderUtils.locateBarrier(node.getX(), node.getY());
 
                 if (nodeID != -1) {
                     PathfinderUtils.remove(nodeID);
                 }
             }
 
-            repaint();
         }
+
+        repaint();
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         key = e.getKeyChar();
 
+        if (key == 'q') {
+            System.exit(0);
+        }
+
         if (key == KeyEvent.VK_SPACE) {
             if (running == false && isFinished == false) {
                 if (PathfinderUtils.startNode == null || PathfinderUtils.endNode == null) {
-                    JOptionPane.showMessageDialog(null, "Missing start or end node", "Missing node",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Missing start or end node", "Missing node", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 running = true;
 
-                // AStar needs to extend runnable because otherwise map.repaint() will wait to update the UI
+                // AStar needs to extend runnable because otherwise calling map.repaint() will wait for AStar to complete the pathfinding before updating the UI
                 new Thread(new AStar(this)).start();
             } else if (running == false && isFinished == true) {
                 PathfinderUtils.barriers.clear();
@@ -242,9 +235,8 @@ class Map extends JPanel implements MouseListener, MouseMotionListener, KeyListe
                 PathfinderUtils.endNode = null;
 
                 isFinished = false;
-                running = false;
 
-                this.repaint();
+                repaint();
             }
         }
     }
